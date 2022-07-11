@@ -5,7 +5,7 @@ class ReactiveEffect {
   }
   run() {
     activeEffect = this
-    this._fn()
+    return this._fn()
   }
 }
 const targetMap = new WeakMap() //存储每个响应式对象的Map
@@ -39,4 +39,6 @@ export function trigger(target, key, value) {
 export function effect(fn) {
   const _effect = new ReactiveEffect(fn)
   _effect.run()
+
+  return _effect.run.bind(_effect)
 }
