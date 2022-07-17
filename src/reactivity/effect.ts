@@ -7,7 +7,14 @@ class ReactiveEffect {
     activeEffect = this
     return this._fn()
   }
+  stop() {}
 }
+
+export interface ReactiveEffectRunner<T = any> {
+  (): T
+  effect: ReactiveEffect
+}
+
 const targetMap = new WeakMap() //存储每个响应式对象的Map
 let activeEffect //当前effect实例
 // 追踪依赖
@@ -41,9 +48,13 @@ export function trigger(target, key, value) {
   }
 }
 
-export function effect(fn, options: any = {}) {
+export function effect(fn, options: any = {}): ReactiveEffectRunner {
   const _effect = new ReactiveEffect(fn, options.scheduler)
   _effect.run()
 
-  return _effect.run.bind(_effect)
+  return _effect.run.bind(_effect) as ReactiveEffectRunner
+}
+
+export function stop(runner: ReactiveEffectRunner) {
+  runner.effect.stop()
 }
