@@ -1,5 +1,13 @@
 import { Dep } from "./dep"
 
+export interface ReactiveEffectOptions {
+  lazy?: boolean
+  scheduler?: Function
+  // scope?: EffectScope
+  allowRecurse?: boolean
+  onStop?: () => void
+}
+
 export class ReactiveEffect {
   private _fn: any
   deps: Dep[] = []
@@ -69,7 +77,10 @@ export function trigger(target, key, value) {
   }
 }
 
-export function effect(fn, options: any = {}): ReactiveEffectRunner {
+export function effect(
+  fn,
+  options: ReactiveEffectOptions = {}
+): ReactiveEffectRunner {
   const _effect = new ReactiveEffect(fn, options.scheduler)
   _effect.run()
   Object.assign(_effect, options)
