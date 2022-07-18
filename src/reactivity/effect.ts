@@ -3,6 +3,8 @@ import { Dep } from "./dep"
 export class ReactiveEffect {
   private _fn: any
   deps: Dep[] = []
+  active = true
+  onStop?: () => void
   constructor(fn, public scheduler?) {
     this._fn = fn
   }
@@ -11,10 +13,21 @@ export class ReactiveEffect {
     return this._fn()
   }
   stop() {
-    this.deps.forEach((dep) => {
-      dep.delete(this)
-    })
+    if (this.active) {
+      if (this.onStop) {
+        this.onStop()
+      }
+      cleanupEffect(this)
+      this.active = false
+    }
   }
+}
+
+// 清除effect
+function cleanupEffect(effect: ReactiveEffect) {
+  effect.deps.forEach((dep) => {
+    dep.delete(effect)
+  })
 }
 
 export interface ReactiveEffectRunner<T = any> {
@@ -59,6 +72,7 @@ export function trigger(target, key, value) {
 export function effect(fn, options: any = {}): ReactiveEffectRunner {
   const _effect = new ReactiveEffect(fn, options.scheduler)
   _effect.run()
+  Object.assign(_effect, options)
   const runner = _effect.run.bind(_effect) as ReactiveEffectRunner
   runner.effect = _effect
   return runner
