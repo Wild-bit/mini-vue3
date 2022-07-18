@@ -1,5 +1,8 @@
-class ReactiveEffect {
+import { Dep } from "./dep"
+
+export class ReactiveEffect {
   private _fn: any
+  deps: Dep[] = []
   constructor(fn, public scheduler?) {
     this._fn = fn
   }
@@ -7,7 +10,11 @@ class ReactiveEffect {
     activeEffect = this
     return this._fn()
   }
-  stop() {}
+  stop() {
+    this.deps.forEach((dep) => {
+      dep.delete(this)
+    })
+  }
 }
 
 export interface ReactiveEffectRunner<T = any> {
@@ -30,8 +37,9 @@ export function track(target, key) {
     dep = new Set()
     depsMap.set(key, dep)
   }
-
+  if (!activeEffect) return
   dep.add(activeEffect) // 添加依赖 effect
+  activeEffect.deps.push(dep) // 反向收集dep、用于stop功能找到对应的dep
 }
 // 触发依赖
 export function trigger(target, key, value) {
@@ -51,10 +59,10 @@ export function trigger(target, key, value) {
 export function effect(fn, options: any = {}): ReactiveEffectRunner {
   const _effect = new ReactiveEffect(fn, options.scheduler)
   _effect.run()
-
-  return _effect.run.bind(_effect) as ReactiveEffectRunner
+  const runner = _effect.run.bind(_effect) as ReactiveEffectRunner
+  runner.effect = _effect
+  return runner
 }
-
 export function stop(runner: ReactiveEffectRunner) {
   runner.effect.stop()
 }
