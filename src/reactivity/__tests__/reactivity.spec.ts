@@ -1,4 +1,5 @@
 import { reactive } from "../reactivity"
+
 describe("reactive", () => {
   it("happy path", () => {
     const originObj = { foo: 1 }
