@@ -9,6 +9,8 @@ describe("readonly", () => {
     expect(wrapped.age).toBe(1)
     expect(isReadOnly(wrapped)).toBe(true)
     expect(isReadOnly(original)).toBe(false)
+    expect(isReadOnly(wrapped.bar)).toBe(true)
+    expect(isReadOnly(original.bar)).toBe(false)
   })
 
   it("warn then call set", () => {
