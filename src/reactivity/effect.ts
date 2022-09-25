@@ -8,6 +8,9 @@ export interface ReactiveEffectOptions {
   onStop?: () => void
 }
 
+let activeEffect //当前effect实例
+let shouldTrack = false // 控制是否执行fn
+
 export class ReactiveEffect {
   private _fn: any
   deps: Dep[] = []
@@ -17,15 +20,30 @@ export class ReactiveEffect {
     this._fn = fn
   }
   run() {
+    // 执行 fn  但是不收集依赖
+    if (!this.active) {
+      return this._fn()
+    }
+    // 执行 fn  收集依赖
+    // 可以开始收集依赖了
+    shouldTrack = true
+    // 执行的时候给全局的 activeEffect 赋值
+    // 利用全局属性来获取当前的 effect
     activeEffect = this
-    return this._fn()
+    const result = this._fn()
+    // 重置
+    shouldTrack = false
+    activeEffect = undefined
+    return result
   }
   stop() {
     if (this.active) {
+      // 如果第一次执行 stop 后 active 就 false 了
+      // 这是为了防止重复的调用，执行 stop 逻辑
+      cleanupEffect(this)
       if (this.onStop) {
         this.onStop()
       }
-      cleanupEffect(this)
       this.active = false
     }
   }
@@ -44,9 +62,10 @@ export interface ReactiveEffectRunner<T = any> {
 }
 
 const targetMap = new WeakMap() //存储每个响应式对象的Map
-let activeEffect //当前effect实例
 // 追踪依赖
 export function track(target, key) {
+  // 判断是否应该收集依赖
+  if (!isTracking()) return
   // target -> key -> effect
   let depsMap = targetMap.get(target)
   if (!depsMap) {
@@ -58,7 +77,8 @@ export function track(target, key) {
     dep = new Set()
     depsMap.set(key, dep)
   }
-  if (!activeEffect) return
+  // 如果effect已经被收集进了dep中
+  if (dep.has(activeEffect)) return
   dep.add(activeEffect) // 添加依赖 effect
   activeEffect.deps.push(dep) // 反向收集dep、用于stop功能找到对应的dep
 }
@@ -75,6 +95,10 @@ export function trigger(target, key, value) {
       effect.run()
     }
   }
+}
+
+export function isTracking() {
+  return shouldTrack && activeEffect !== undefined
 }
 
 export function effect(
