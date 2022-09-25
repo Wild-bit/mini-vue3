@@ -5,6 +5,7 @@ import { reactive, ReactiveFlags, readonly } from "./reactive"
 const get = createGetter()
 const set = createSetter()
 const readonlyGet = createGetter(true)
+const shallowReadonlyGet = createGetter(true, true)
 
 export const mutabHandlers = {
   get,
@@ -23,7 +24,19 @@ export const readonlyHandlers = {
   },
 }
 
-export function createGetter(isReadOnly = false) {
+export const shallowReadonlyHandlers = {
+  get: shallowReadonlyGet,
+  set(target, key) {
+    // readonly 的响应式对象不可以修改值
+    console.warn(
+      `Set operation on key "${String(key)}" failed: target is readonly.`,
+      target
+    )
+    return true
+  },
+}
+
+export function createGetter(isReadOnly = false, shallow = false) {
   return function get(target, key) {
     if (key === ReactiveFlags.IS_REACTIVE) {
       return !isReadOnly
@@ -31,6 +44,9 @@ export function createGetter(isReadOnly = false) {
       return isReadOnly
     }
     const res = Reflect.get(target, key)
+    if (shallow) {
+      return res
+    }
     if (isObject(res)) {
       return isReadOnly ? readonly(res) : reactive(res)
     }
