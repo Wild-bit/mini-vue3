@@ -26,6 +26,12 @@ export function isReadOnly(obj) {
   return !!obj[ReactiveFlags.IS_READONLY]
 }
 
+// check if an object is a proxy created by reactive or readonly
+// 判断是否是由reactive或readonly创建出来的额proxy对象
+export function isProxy(obj) {
+  return isReactive(obj) || isReadOnly(obj)
+}
+
 export function shallowReadonly(obj) {
   return createReactiveObject(obj, shallowReadonlyHandlers)
 }
