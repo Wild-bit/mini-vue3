@@ -10,3 +10,4 @@
 - [x] 支持 effect.stop
 - [x] 支持 isReactive
 - [x] 支持 isReadonly
+- [x] 支持 shallowReadonly
