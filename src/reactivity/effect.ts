@@ -77,16 +77,15 @@ export function track(target, key) {
     dep = new Set()
     depsMap.set(key, dep)
   }
-  // 如果effect已经被收集进了dep中
+  trackEffects(dep)
+}
+export function trackEffects(dep) {
   if (dep.has(activeEffect)) return
   dep.add(activeEffect) // 添加依赖 effect
-  activeEffect.deps.push(dep) // 反向收集dep、用于stop功能找到对应的dep
+  ;(activeEffect as ReactiveEffect).deps.push(dep) //反向收集dep、用于stop功能找到对应的dep
 }
-// 触发依赖
-export function trigger(target, key, value) {
-  let depsMap = targetMap.get(target)
-  let dep = depsMap.get(key)
 
+export function triggertEffects(dep: Dep) {
   for (const effect of dep) {
     if (effect.scheduler) {
       effect.scheduler()
@@ -95,6 +94,13 @@ export function trigger(target, key, value) {
       effect.run()
     }
   }
+}
+
+// 触发依赖
+export function trigger(target, key, value) {
+  let depsMap = targetMap.get(target)
+  let dep = depsMap.get(key)
+  triggertEffects(dep)
 }
 
 export function isTracking() {
