@@ -13,3 +13,4 @@
 - [x] 支持 isReadonly
 - [x] 支持 shallowReadonly
 - [x] 支持 isProxy 
+- [x] 支持 isRef 

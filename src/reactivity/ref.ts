@@ -6,6 +6,7 @@ class RefImpl {
   private _value: any
   private _rawValue: any
   public dep
+  public _v_isRef = true
 
   constructor(value) {
     // 如果是一个引用值类型，就创建reactive对象，从而实现响应式的依赖的收集和触发
@@ -43,4 +44,8 @@ export function triggertRefValue(ref) {
 
 export function convert(value) {
   return isObject(value) ? reactive(value) : value
+}
+
+export function isRef(value) {
+  return !!value._v_isRef
 }
