@@ -82,7 +82,7 @@ export function track(target, key) {
 export function trackEffects(dep) {
   if (dep.has(activeEffect)) return
   dep.add(activeEffect) // 添加依赖 effect
-  ;(activeEffect as ReactiveEffect).deps.push(dep) //反向收集dep、用于stop功能找到对应的dep
+  ;(activeEffect as any).deps.push(dep) //反向收集dep、用于stop功能找到对应的dep
 }
 
 export function triggertEffects(dep: Dep) {

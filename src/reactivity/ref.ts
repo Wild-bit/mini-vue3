@@ -2,6 +2,9 @@ import { hasChanged, isObject } from "../shared"
 import { isTracking, trackEffects, triggertEffects } from "./effect"
 import { reactive } from "./reactive"
 
+export interface Ref<T = any> {
+  value: T
+}
 class RefImpl {
   private _value: any
   private _rawValue: any
@@ -40,6 +43,10 @@ export function trackRefValue(ref) {
 }
 export function triggertRefValue(ref) {
   triggertEffects(ref.dep)
+}
+
+export function unref<T>(ref: Ref<T> | T) {
+  return isRef(ref) ? (ref as any).value : ref
 }
 
 export function convert(value) {
