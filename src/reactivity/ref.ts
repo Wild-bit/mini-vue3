@@ -1,4 +1,6 @@
+import { hasChanged, isObject } from "../shared"
 import { isTracking, trackEffects, triggertEffects } from "./effect"
+import { reactive } from "./reactive"
 
 class RefImpl {
   private _value: any
@@ -6,7 +8,8 @@ class RefImpl {
   public dep
 
   constructor(value) {
-    this._value = value
+    // 如果是一个引用值类型，就创建reactive对象，从而实现响应式的依赖的收集和触发
+    this._value = isObject(value) ? reactive(value) : value
     this.dep = new Set()
   }
   get value() {
@@ -17,7 +20,7 @@ class RefImpl {
   }
   set value(newValue) {
     if (hasChanged(newValue, this._rawValue)) {
-      this._value = newValue
+      this._value = isObject(newValue) ? reactive(newValue) : newValue
       this._rawValue = newValue
       //  触发依赖
       triggertRefValue(this)
@@ -38,6 +41,6 @@ export function triggertRefValue(ref) {
   triggertEffects(ref.dep)
 }
 
-export function hasChanged(value, oldValue) {
-  return !Object.is(value, oldValue)
+export function convert(value) {
+  return isObject(value) ? reactive(value) : value
 }
