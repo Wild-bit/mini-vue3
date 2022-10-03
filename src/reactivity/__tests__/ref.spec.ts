@@ -1,7 +1,7 @@
 import { isObject } from "../../shared"
 import { effect } from "../effect"
 import { reactive } from "../reactive"
-import { isRef, ref, unref } from "../ref"
+import { isRef, proxyRefs, ref, unRef } from "../ref"
 
 describe("ref", () => {
   it("ref return a object that have property of value", () => {
@@ -51,6 +51,25 @@ describe("ref", () => {
     expect(dummy).toBe(2)
   })
 
+  it("proxyRefs", () => {
+    const user = {
+      age: ref(10),
+      name: "xiaohong",
+    }
+    const proxyUser = proxyRefs(user)
+    expect(user.age.value).toBe(10)
+    // 如果属性为ref 访问时不需要.value获取值
+    expect(proxyUser.age).toBe(10)
+    expect(proxyUser.name).toBe("xiaohong")
+    proxyUser.age = 20
+    expect(proxyUser.age).toBe(20)
+    expect(user.age.value).toBe(20)
+
+    proxyUser.age = ref(10)
+    expect(proxyUser.age).toBe(10)
+    expect(user.age.value).toBe(10)
+  })
+
   it("isRef", () => {
     const a = ref(1)
     const user = reactive({
@@ -65,7 +84,7 @@ describe("ref", () => {
     // 如果参数是 ref，则返回内部值，否则返回参数本身。
     // 这是 val = isRef(val) ? val.value : val 计算的一个语法糖。
     const a = ref(1)
-    expect(unref(a)).toBe(1)
-    expect(unref(1)).toBe(1)
+    expect(unRef(a)).toBe(1)
+    expect(unRef(1)).toBe(1)
   })
 })

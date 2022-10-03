@@ -1,6 +1,7 @@
 import { isObject } from "../shared"
 import { track, trigger } from "./effect"
 import { reactive, ReactiveFlags, readonly } from "./reactive"
+import { unref } from "./ref"
 
 const get = createGetter()
 const set = createSetter()
@@ -35,6 +36,12 @@ export const shallowReadonlyHandlers = {
     return true
   },
 }
+
+// export const proxyRefsHandlers = {
+//   get(target,key){
+//     return unref()
+//   }
+// }
 
 export function createGetter(isReadOnly = false, shallow = false) {
   return function get(target, key) {
