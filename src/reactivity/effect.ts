@@ -109,11 +109,11 @@ export function isTracking() {
 
 export function effect(
   fn,
-  options: ReactiveEffectOptions = {}
+  options?: ReactiveEffectOptions
 ): ReactiveEffectRunner {
-  const _effect = new ReactiveEffect(fn, options.scheduler)
-  _effect.run()
+  const _effect = new ReactiveEffect(fn, options)
   Object.assign(_effect, options)
+  _effect.run()
   const runner = _effect.run.bind(_effect) as ReactiveEffectRunner
   runner.effect = _effect
   return runner
