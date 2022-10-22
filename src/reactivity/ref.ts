@@ -1,6 +1,7 @@
 import { hasChanged, isObject } from "../shared"
 import { isTracking, trackEffects, triggertEffects } from "./effect"
 import { reactive } from "./reactive"
+import { proxyRefsHandlers } from "./baseHandlers"
 
 export interface Ref<T = any> {
   value: T
@@ -64,17 +65,5 @@ export function isRef(value) {
 // 解决方案就是通过 proxy 来对 ref 做处理
 
 export function proxyRefs(objectWithRefs) {
-  return new Proxy(objectWithRefs, {
-    get(target, key) {
-      // 如果属性为ref 访问时不需要.value获取值
-      return unRef(Reflect.get(target, key))
-    },
-    set(target, key, value) {
-      if (isRef(target[key]) && !isRef(value)) {
-        return (target[key].value = value)
-      } else {
-        return Reflect.set(target, key, value)
-      }
-    },
-  })
+  return new Proxy(objectWithRefs, proxyRefsHandlers)
 }

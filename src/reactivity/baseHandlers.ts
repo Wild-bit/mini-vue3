@@ -1,7 +1,7 @@
 import { isObject } from "../shared"
 import { track, trigger } from "./effect"
 import { reactive, ReactiveFlags, readonly } from "./reactive"
-import { unref } from "./ref"
+import { isRef, unRef, unref } from "./ref"
 
 const get = createGetter()
 const set = createSetter()
@@ -37,11 +37,19 @@ export const shallowReadonlyHandlers = {
   },
 }
 
-// export const proxyRefsHandlers = {
-//   get(target,key){
-//     return unref()
-//   }
-// }
+export const proxyRefsHandlers = {
+  get(target, key) {
+    // 如果属性为ref 访问时不需要.value获取值
+    return unRef(Reflect.get(target, key))
+  },
+  set(target, key, value) {
+    if (isRef(target[key]) && !isRef(value)) {
+      return (target[key].value = value)
+    } else {
+      return Reflect.set(target, key, value)
+    }
+  },
+}
 
 export function createGetter(isReadOnly = false, shallow = false) {
   return function get(target, key) {

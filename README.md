@@ -7,6 +7,7 @@
 - [x] trigger 触发依赖
 - [x] readonly 的实现
 - [x] ref的实现 
+- [x] computed的实现
 - [x] 支持 effect.scheduler
 - [x] 支持 effect.stop
 - [x] 支持 isReactive
