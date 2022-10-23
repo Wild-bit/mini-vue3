@@ -1,4 +1,4 @@
-import { reader } from "./renderer"
+import { render } from "./renderer"
 import { createVNode } from "./vnode"
 
 export function createApp(rootComponent) {
@@ -7,7 +7,7 @@ export function createApp(rootComponent) {
       // 先将根容器转为vnode
       // component -> vnode
       const vnode = createVNode(rootComponent)
-      reader(vnode, rootContainer)
+      render(vnode, rootContainer)
     },
   }
   return app

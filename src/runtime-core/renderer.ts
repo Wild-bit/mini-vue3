@@ -1,6 +1,6 @@
 import { createComponentInstance, setupComponent } from "./component"
 
-export function reader(vnode, container) {
+export function render(vnode, container) {
   // path
   path(vnode, container)
 }

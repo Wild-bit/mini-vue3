@@ -5,18 +5,23 @@
   "main": "index.js",
   "repository": "git@github.com:Wild-bit/mini-vue3.git",
   "author": "Wild-bit",
+  "type": "module",
   "license": "ISC",
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "build": "rollup -c"
   },
   "devDependencies": {
     "@babel/core": "^7.18.6",
     "@babel/preset-env": "^7.18.6",
     "@babel/preset-typescript": "^7.18.6",
+    "@rollup/plugin-typescript": "^9.0.2",
     "@types/jest": "^28.1.4",
     "babel-jest": "^28.1.2",
     "jest": "^28.1.2",
+    "rollup": "^3.2.3",
     "ts-node": "^10.8.2",
+    "tslib": "^2.4.0",
     "typescript": "^4.7.4"
   }
 }

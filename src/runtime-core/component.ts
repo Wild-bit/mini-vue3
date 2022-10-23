@@ -1,4 +1,4 @@
-import { isObject } from "../shared"
+import { isObject } from "../shared/index"
 
 export function createComponentInstance(vnode) {
   const component = {
@@ -36,7 +36,7 @@ function finishComponentSetup(instance) {
 
   // 先取到用户设置的 component options
   const Component = instance.type
-  if (!instance.render) {
+  if (instance.render) {
     instance.reader = Component.render
   }
 }
