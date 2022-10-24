@@ -36,7 +36,7 @@ function finishComponentSetup(instance) {
 
   // 先取到用户设置的 component options
   const Component = instance.type
-  if (instance.render) {
-    instance.reader = Component.render
-  }
+  // if (instance.render) {
+  instance.render = Component.render
+  // }
 }
